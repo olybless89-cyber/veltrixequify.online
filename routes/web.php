@@ -9,22 +9,7 @@ Route::get('/clear', function () {
     return $output->fetch();
 })->name('/clear');
 
-Route::get('/health', function () {
-    $dbStatus = 'disconnected';
-    try {
-        \Illuminate\Support\Facades\DB::connection()->getPdo();
-        $dbStatus = 'connected';
-    } catch (\Exception $e) {
-        $dbStatus = 'connecting: ' . $e->getMessage();
-    }
-    return response()->json([
-        'status' => 'healthy',
-        'service' => config('basic.site_title', 'Matrix HYIP'),
-        'database' => $dbStatus,
-        'storage_writable' => is_writable(storage_path('framework')),
-        'timestamp' => now()->toIso8601String(),
-    ]);
-})->name('health');
+// Health check route defined below (near bottom of file)
 
 Route::get('/user', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('/loginModal', 'Auth\LoginController@loginModal')->name('loginModal');
