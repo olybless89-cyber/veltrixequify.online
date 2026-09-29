@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matrix_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: matrix_db
+      DB_USERNAME: matrix_user
+      DB_PASSWORD: matrix_password
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@gmail.com
+      ADMIN_PASSWORD: admin123456
+    depends_on:
+      - db
+    networks:
+      - matrix-net
+
+  db:
+    image: mysql:8.0
+    container_name: matrix_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: matrix_db
+      MYSQL_USER: matrix_user
+      MYSQL_PASSWORD: matrix_password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - matrix-net
+
+volumes:
+  dbdata:
+    driver: local
+
+networks:
+  matrix-net:
+    driver: bridge
