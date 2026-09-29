@@ -16,6 +16,7 @@ use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
@@ -38,6 +39,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrap();
+
+        // Belt-and-suspenders alongside TrustProxies: in production this
+        // app is only ever served through Railway's HTTPS edge, so force
+        // every generated URL/asset link to https regardless of what
+        // scheme the request object resolves to. Prevents mixed-content
+        // asset blocking. Left alone outside production (e.g. local
+        // docker-compose over plain http) so nothing else breaks.
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
 
         if ($resendKey = env('RESEND_API_KEY')) {
             config([
