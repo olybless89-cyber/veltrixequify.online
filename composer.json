@@ -48,7 +48,10 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "facade/ignition"
+                "facade/ignition",
+                "laravel/breeze",
+                "laravel/sail",
+                "nunomaduro/collision"
             ]
         }
     },
@@ -58,7 +61,7 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
-        "files":[
+        "files": [
             "app/Helper/helpers.php"
         ]
     },
