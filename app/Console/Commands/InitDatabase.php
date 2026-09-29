@@ -100,6 +100,58 @@ class InitDatabase extends Command
             $this->warn("Notice while running migrations: " . $e->getMessage());
         }
 
+        // 2b. Repair the `contents` table directly. This runs independently
+        // of the `migrate` call above: the very first migration this app
+        // ships (create_users_table, 2021) always throws "table already
+        // exists" against the raw SQL dump's own users table, and a single
+        // failing migration aborts the whole `migrate` batch before any
+        // later-dated migration -- including a schema fix -- ever runs.
+        // So the fix has to happen here, directly, where a working DB
+        // connection is already guaranteed. Additive only: never drops or
+        // truncates anything, safe to run on every boot.
+        try {
+            if (!Schema::hasTable('contents')) {
+                Schema::create('contents', function ($table) {
+                    $table->unsignedInteger('id')->primary();
+                    $table->string('name', 191)->nullable();
+                    $table->timestamps();
+                });
+                $this->info("✓ Created missing [contents] table.");
+            } elseif (!Schema::hasColumn('contents', 'name')) {
+                Schema::table('contents', function ($table) {
+                    $table->string('name', 191)->nullable()->after('id');
+                });
+                $this->info("✓ Added missing [contents.name] column.");
+            }
+
+            $contentRows = [
+                [7, 'counter'], [8, 'counter'], [9, 'counter'], [10, 'counter'],
+                [15, 'service'], [16, 'service'], [17, 'service'],
+                [18, 'testimonial'], [19, 'testimonial'],
+                [33, 'support'], [34, 'support'],
+                [37, 'how-it-work'], [38, 'how-it-work'], [39, 'how-it-work'], [40, 'how-it-work'],
+                [56, 'social'], [58, 'social'], [59, 'social'], [60, 'social'],
+                [61, 'blog'], [62, 'blog'], [63, 'blog'],
+                [64, 'feature'], [65, 'feature'], [66, 'feature'],
+                [67, 'why-chose-us'], [68, 'why-chose-us'], [69, 'why-chose-us'],
+                [70, 'why-chose-us'], [71, 'why-chose-us'], [72, 'why-chose-us'],
+                [74, 'testimonial'],
+                [76, 'how-we-work'], [77, 'how-we-work'], [78, 'how-we-work'],
+                [83, 'know-more-us'], [84, 'know-more-us'], [85, 'know-more-us'], [86, 'know-more-us'],
+                [88, 'faq'],
+            ];
+            $now = now();
+            foreach ($contentRows as [$id, $name]) {
+                DB::table('contents')->updateOrInsert(
+                    ['id' => $id],
+                    ['name' => $name, 'created_at' => $now, 'updated_at' => $now]
+                );
+            }
+            $this->info("✓ [contents] table verified (" . count($contentRows) . " rows).");
+        } catch (\Exception $e) {
+            $this->warn("Notice while repairing [contents] table: " . $e->getMessage());
+        }
+
         // 3. Ensure Default Admin Account
         $adminUsername = $this->option('admin-username') ?: env('ADMIN_USERNAME', 'admin');
         $adminEmail = $this->option('admin-email') ?: env('ADMIN_EMAIL', 'admin@gmail.com');
