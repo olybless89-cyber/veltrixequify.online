@@ -78,10 +78,22 @@ if [ -n "$RESEND_API_KEY" ]; then
     sed -i "s|^MAIL_PASSWORD=.*|MAIL_PASSWORD=${RESEND_API_KEY}|" /var/www/html/.env
 fi
 
-# 6. Generate APP_KEY if missing
-if ! grep -q "APP_KEY=base64:" /var/www/html/.env 2>/dev/null; then
+# 6. Application key
+# .env is rebuilt from .env.example on every container start (nothing
+# persists it), so blindly running key:generate here would mint a brand
+# new key on every single deploy -- and Laravel encrypts session/CSRF
+# cookies with this key, so every deploy would silently invalidate every
+# logged-in session and every open form. If APP_KEY was provided as a
+# platform env var (Railway), persist that same value into .env so it
+# stays stable across deploys; only fall back to generating a fresh one
+# when no key has ever been set anywhere (first boot with none configured).
+if [ -n "$APP_KEY" ]; then
+    sed -i "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|" /var/www/html/.env
+elif ! grep -q "APP_KEY=base64:" /var/www/html/.env 2>/dev/null; then
     echo "Generating Application Key..."
     php /var/www/html/artisan key:generate --force --no-interaction || true
+    echo "⚠️  No APP_KEY was set as a platform variable -- a new one was generated for this boot only."
+    echo "   Set APP_KEY as a persistent env var, or every future deploy will invalidate all sessions."
 fi
 
 # 7. Storage directories & permissions
