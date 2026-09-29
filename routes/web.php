@@ -11,7 +11,6 @@ Route::get('/clear', function () {
 
 // Health check route defined below (near bottom of file)
 
-Route::get('/user', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('/loginModal', 'Auth\LoginController@loginModal')->name('loginModal');
 
 Route::get('queue-work', function () {
