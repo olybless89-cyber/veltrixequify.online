@@ -226,7 +226,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         /*=====Payment Log=====*/
         Route::get('payment-methods', 'Admin\PaymentMethodController@index')->name('payment.methods');
         Route::post('payment-methods/deactivate', 'Admin\PaymentMethodController@deactivate')->name('payment.methods.deactivate');
-        Route::get('payment-methods/deactivate', 'Admin\PaymentMethodController@deactivate')->name('payment.methods.deactivate');
+        Route::get('payment-methods/deactivate', 'Admin\PaymentMethodController@deactivate');
         Route::post('sort-payment-methods', 'Admin\PaymentMethodController@sortPaymentMethods')->name('sort.payment.methods');
         Route::get('payment-methods/edit/{id}', 'Admin\PaymentMethodController@edit')->name('edit.payment.methods');
         Route::put('payment-methods/update/{id}', 'Admin\PaymentMethodController@update')->name('update.payment.methods');
