@@ -114,7 +114,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('/', 'Admin\LoginController@showLoginForm')->name('login');
-    Route::post('/', 'Admin\LoginController@login')->name('login');
+    Route::post('/', 'Admin\LoginController@login');
     Route::post('/logout', 'Admin\LoginController@logout')->name('logout');
 
     Route::get('/password/reset', 'Admin\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
