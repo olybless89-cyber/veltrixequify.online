@@ -128,7 +128,7 @@ done
 if [ "$DB_READY" = "1" ]; then
     echo "✅ Database connected. Running initialization..."
     # Run Veltrix custom init (imports SQL if fresh, seeds admin, etc.)
-    php /var/www/html/artisan matrix:init-db --force --no-interaction || echo "Notice: DB init already completed."
+    php /var/www/html/artisan matrix:init-db --no-interaction || echo "Notice: DB init already completed."
 else
     echo "⚠️  DB connection timeout — will retry at request time."
 fi
