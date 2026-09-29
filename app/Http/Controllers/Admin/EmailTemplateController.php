@@ -222,7 +222,12 @@ class EmailTemplateController extends Controller
 
         $email_from = $basic->sender_email;
 
-        @Mail::to($request->email)->send(new SendMail($email_from, "Test Email", "Your " . $_SERVER['SERVER_NAME'] . " email is working."));
+        try {
+            @Mail::to($request->email)->send(new SendMail($email_from, "Test Email", "Your " . $_SERVER['SERVER_NAME'] . " email is working."));
+        } catch (\Throwable $e) {
+            try { \Log::error('test mail: failed to send', ['error' => $e->getMessage()]); } catch (\Throwable $ignore) {}
+            return back()->with('error', 'Could not send test email: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Email has been sent successfully.');
     }

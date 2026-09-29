@@ -151,6 +151,21 @@ php /var/www/html/artisan config:cache 2>/dev/null || true
 php /var/www/html/artisan route:cache 2>/dev/null || true
 php /var/www/html/artisan view:cache 2>/dev/null || true
 
+# 10b. Re-fix storage/bootstrap-cache ownership one more time.
+# Every artisan call above (db:monitor, matrix:init-db, optimize:clear,
+# config:cache, route:cache, view:cache) runs as root (this entrypoint
+# has no USER directive) and can create brand-new files under
+# storage/logs or storage/framework/* -- e.g. the first line ever
+# written to storage/logs/laravel.log. Those get created root-owned,
+# *after* the one-time chown at step 7 already ran, so php-fpm's
+# worker (which drops to www-data) hits "Permission denied" the first
+# time it tries to append to that file -- which is exactly what
+# masked the real error behind every request that first triggers a
+# framework log write. Re-running chown here, right before supervisor
+# starts serving requests, covers anything created in between.
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+
 echo ""
 echo "🚀 Veltrix Equify is ready! Launching services..."
 echo ""

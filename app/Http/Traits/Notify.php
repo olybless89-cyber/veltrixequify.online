@@ -57,7 +57,11 @@ trait Notify
                 $subject = ($subject == null) ? $templateObj->subject : $subject;
                 $email_from = ($templateObj) ? $templateObj->email_from : $basic->sender_email;
 
-                @Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+                try {
+                    @Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+                } catch (\Throwable $e) {
+                    try { \Log::error('mailToAdmin: failed to queue notification email', ['error' => $e->getMessage()]); } catch (\Throwable $ignore) {}
+                }
             }
         }
     }
@@ -96,7 +100,11 @@ trait Notify
             $subject = ($subject == null) ? $templateObj->subject : $subject;
             $email_from = ($templateObj) ? $templateObj->email_from : $basic->sender_email;
 
-            @Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+            try {
+                @Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
+            } catch (\Throwable $e) {
+                try { \Log::error('mail: failed to queue notification email', ['error' => $e->getMessage()]); } catch (\Throwable $ignore) {}
+            }
         }
 
 
@@ -135,7 +143,11 @@ trait Notify
             $subject = ($subject == null) ? $templateObj->subject : $subject;
             $email_from = ($templateObj) ? $templateObj->email_from : $basic->sender_email;
 
-            @Mail::to($user)->send(new SendMail($email_from, $subject, $message));
+            try {
+                @Mail::to($user)->send(new SendMail($email_from, $subject, $message));
+            } catch (\Throwable $e) {
+                try { \Log::error('mailVerification: failed to send verification email', ['error' => $e->getMessage()]); } catch (\Throwable $ignore) {}
+            }
         }
 
 

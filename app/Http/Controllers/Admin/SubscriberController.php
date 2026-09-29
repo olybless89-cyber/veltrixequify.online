@@ -63,7 +63,11 @@ class SubscriberController extends Controller
             $name = explode('@', $subscriber->email)[0];
             $message = str_replace("[[name]]", $name, $email_body);
             $message = str_replace("[[message]]", $requestMessage, $message);
-            @Mail::to($subscriber->email)->queue(new SendMail($email_from, $subject, $message));
+            try {
+                @Mail::to($subscriber->email)->queue(new SendMail($email_from, $subject, $message));
+            } catch (\Throwable $e) {
+                try { \Log::error('subscriber mail: failed to queue email', ['subscriber' => $subscriber->email, 'error' => $e->getMessage()]); } catch (\Throwable $ignore) {}
+            }
         }
         return back()->with('success', 'Email has been sent to subscribers.');
     }
