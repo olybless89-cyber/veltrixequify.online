@@ -235,12 +235,17 @@ class InitDatabase extends Command
                     'smtp_password' => $resendKey,
                 ];
 
-                DB::table('configures')->where('id', 1)->update([
-                    'site_title' => $siteTitle,
-                    'sender_email' => $senderEmail,
-                    'sender_email_name' => $senderName,
-                    'email_configuration' => json_encode($emailConfig),
-                ]);
+                DB::table('configures')->where('id', 1)->update(['site_title' => $siteTitle]);
+
+                // Only overwrite mail settings when a Resend key is provided via env.
+                // Otherwise leave whatever was configured in Admin > Email Controls untouched.
+                if (!empty(env('RESEND_API_KEY'))) {
+                    DB::table('configures')->where('id', 1)->update([
+                        'sender_email' => $senderEmail,
+                        'sender_email_name' => $senderName,
+                        'email_configuration' => json_encode($emailConfig),
+                    ]);
+                }
 
                 if (Schema::hasTable('manage_plans')) {
                     DB::table('manage_plans')->where('name', 'Matrix')->update(['name' => 'Veltrix Starter']);
