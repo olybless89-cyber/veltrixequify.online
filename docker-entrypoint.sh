@@ -42,7 +42,7 @@ if [ -n "$RESEND_API_KEY" ]; then
     export MAIL_PASSWORD="$RESEND_API_KEY"
     export MAIL_MAILER="${MAIL_MAILER:-smtp}"
     export MAIL_HOST="${MAIL_HOST:-smtp.resend.com}"
-    export MAIL_PORT="${MAIL_PORT:-465}"
+    export MAIL_PORT="${MAIL_PORT:-2465}"  # Railway blocks 465/587; Resend alt SSL port
     export MAIL_USERNAME="${MAIL_USERNAME:-resend}"
     export MAIL_ENCRYPTION="${MAIL_ENCRYPTION:-ssl}"
     echo "✅ Resend email configured."
@@ -119,10 +119,6 @@ fi
 echo "Waiting for database connection..."
 DB_READY=0
 for i in $(seq 1 30); do
-    if php /var/www/html/artisan db:monitor --databases=mysql --max=1 --no-interaction 2>/dev/null; then
-        DB_READY=1
-        break
-    fi
     # Fallback check
     if php -r "
         try {

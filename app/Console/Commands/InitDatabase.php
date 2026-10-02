@@ -166,9 +166,14 @@ class InitDatabase extends Command
                     $admin->name = 'Super Administrator';
                 }
 
-                $admin->username = $adminUsername;
-                $admin->email = $adminEmail;
-                $admin->password = Hash::make($adminPassword);
+                // Only set credentials on first creation (or when ADMIN_RESET_PASSWORD=true),
+                // so password/email changes made in the admin panel survive redeploys.
+                $setCredentials = !$admin->exists || filter_var(env('ADMIN_RESET_PASSWORD', false), FILTER_VALIDATE_BOOLEAN);
+                if ($setCredentials) {
+                    $admin->username = $adminUsername;
+                    $admin->email = $adminEmail;
+                    $admin->password = Hash::make($adminPassword);
+                }
                 $admin->status = 1;
                 $admin->admin_access = [
                     "admin.dashboard","admin.staff","admin.storeStaff","admin.updateStaff",
@@ -204,9 +209,9 @@ class InitDatabase extends Command
                 $this->info("✓ Administrator account ready:");
                 $this->table(['Setting', 'Value'], [
                     ['Login URL', url('/admin')],
-                    ['Username', $adminUsername],
-                    ['Email', $adminEmail],
-                    ['Password', $adminPassword],
+                    ['Username', $admin->username],
+                    ['Email', $admin->email],
+                    ['Password', $setCredentials ? 'set from ADMIN_PASSWORD (hidden)' : 'unchanged'],
                 ]);
             }
         } catch (\Exception $e) {
@@ -224,8 +229,8 @@ class InitDatabase extends Command
                 $emailConfig = [
                     'name' => 'smtp',
                     'smtp_host' => 'smtp.resend.com',
-                    'smtp_port' => '465',
-                    'smtp_encryption' => 'ssl',
+                    'smtp_port' => (string) env('MAIL_PORT', '2465'),
+                    'smtp_encryption' => env('MAIL_ENCRYPTION', 'ssl'),
                     'smtp_username' => 'resend',
                     'smtp_password' => $resendKey,
                 ];
