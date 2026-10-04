@@ -8,8 +8,19 @@ trait Upload
 {
     public function makeDirectory($path)
     {
-        if (file_exists($path)) return true;
-        return mkdir($path, 0755, true);
+        if (is_dir($path)) {
+            // Re-assert permissions even if the directory already existed
+            // (e.g. it was copied in at build time with different
+            // ownership than the www-data user php-fpm runs as).
+            @chmod($path, 0775);
+            return true;
+        }
+
+        $made = @mkdir($path, 0775, true);
+        if ($made) {
+            @chmod($path, 0775);
+        }
+        return $made;
     }
 
     public function removeFile($path)
@@ -17,13 +28,36 @@ trait Upload
         return file_exists($path) && is_file($path) ? @unlink($path) : false;
     }
 
+    /**
+     * Config values in config/location.php are relative paths (e.g.
+     * "assets/uploads/content/"). Resolving them against whatever the
+     * current working directory happens to be is fragile -- PHP-FPM's
+     * cwd for a web request follows the front controller's directory,
+     * not necessarily the Laravel project root. Anchor to base_path()
+     * so uploads always land in the same place regardless of that, and
+     * normalize the trailing slash so we never end up with a stray
+     * double slash in the stored filename.
+     */
+    protected function resolveUploadPath($location)
+    {
+        $location = rtrim($location, '/');
+
+        if (!str_starts_with($location, '/')) {
+            $location = base_path($location);
+        }
+
+        return $location;
+    }
+
     public function uploadImage($file, $location, $size = null, $old = null, $thumb = null, $filename = null)
     {
-
+        $location = $this->resolveUploadPath($location);
 
         $path = $this->makeDirectory($location);
 
-        if (!$path) throw new \Exception('File could not been created.');
+        if (!$path) {
+            throw new \Exception("Upload directory could not be created or is not writable: {$location}");
+        }
 
         if (!empty($old)) {
             $this->removeFile($location . '/' . $old);
@@ -53,4 +87,3 @@ trait Upload
 
 
 }
-

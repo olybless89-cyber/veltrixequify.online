@@ -109,6 +109,7 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 # Fix uploads directory
 mkdir -p /var/www/html/assets/uploads
 chown -R www-data:www-data /var/www/html/assets/uploads 2>/dev/null || true
+chmod -R 775 /var/www/html/assets/uploads 2>/dev/null || true
 
 # 8. Public assets symlink
 if [ ! -e /var/www/html/public/assets ]; then
