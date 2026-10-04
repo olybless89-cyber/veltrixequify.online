@@ -57,7 +57,7 @@ class ManualGatewayController extends Controller
             try {
                 $getGateway->image = $this->uploadImage($request->image, config('location.gateway.path'), config('location.gateway.size'));
             } catch (\Exception $exp) {
-                return back()->with('error', 'Image could not be uploaded: ' . $exp->getMessage());
+                return back()->with('error', 'Image could not be uploaded.');
             }
         }
 
@@ -135,7 +135,7 @@ class ManualGatewayController extends Controller
                 $old = $getGateway->image ?? null;
                 $getGateway->image = $this->uploadImage($request->image, config('location.gateway.path'), config('location.gateway.size'), $old);
             } catch (\Exception $exp) {
-                return back()->with('error', 'Image could not be uploaded: ' . $exp->getMessage());
+                return back()->with('error', 'Image could not be uploaded.');
             }
         }
 
