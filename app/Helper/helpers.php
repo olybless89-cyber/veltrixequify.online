@@ -47,7 +47,17 @@ function menuActive($routeName, $type = null)
 
 function getFile($image, $clean = '')
 {
-    return file_exists($image) && is_file($image) ? asset($image) . $clean : asset(config('location.default'));
+    // $image is typically a relative path straight out of config/location.php
+    // (e.g. "assets/uploads/content/filename.jpg"). Checking file_exists() on
+    // that relative path resolves it against PHP-FPM's cwd for this request,
+    // which is not reliably the Laravel project root -- so the existence
+    // check can silently fail (falling back to the default placeholder) even
+    // though the file is really there. Resolve against base_path() for the
+    // filesystem check, but keep passing the original relative path to
+    // asset() so the generated URL is unaffected.
+    $path = $image && substr($image, 0, 1) !== '/' ? base_path($image) : $image;
+
+    return $path && file_exists($path) && is_file($path) ? asset($image) . $clean : asset(config('location.default'));
 }
 
 function removeFile($path)
