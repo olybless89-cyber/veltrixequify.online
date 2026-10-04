@@ -22,9 +22,6 @@
                                 </a>
                             </div>
                             <div class="text-box">
-                                <div class="date-author">
-                                    <span><i class="far fa-calendar-alt"></i> {{dateTime(@$data->created_at,'d M, Y')}} </span>
-                                </div>
                                 <a href="{{route('blogDetails',[slug(@$data->description->title), $data->content_id])}}" class="title">{{\Illuminate\Support\Str::limit(@$data->description->title,60)}}</a>
                                 <p>
                                     @lang(\Illuminate\Support\Str::limit(strip_tags(@$data->description->description), 120))
