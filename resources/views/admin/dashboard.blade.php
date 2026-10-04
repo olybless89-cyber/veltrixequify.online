@@ -577,7 +577,7 @@
 
 
 
-    @if($basic->is_active_cron_notification)
+    @if((int) optional(\App\Models\Configure::first())->is_active_cron_notification)
         <div class="modal fade" id="cron-info" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -731,7 +731,7 @@
         });
 
         $(document).ready(function () {
-            let isActiveCronNotification = '{{ $basic->is_active_cron_notification }}';
+            let isActiveCronNotification = '{{ (int) optional(\App\Models\Configure::first())->is_active_cron_notification }}';
             if (isActiveCronNotification == 1)
                 $('#cron-info').modal('show');
             $(document).on('click', '.copy-btn', function () {
