@@ -41,7 +41,18 @@ return [
             'encryption' => env('RESEND_API_KEY') ? env('MAIL_ENCRYPTION', 'ssl') : env('MAIL_ENCRYPTION', 'ssl'),
             'username' => env('RESEND_API_KEY') ? 'resend' : env('MAIL_USERNAME', 'resend'),
             'password' => env('RESEND_API_KEY') ?: env('MAIL_PASSWORD'),
-            'timeout' => null,
+            // A short, explicit connect/send timeout. Without this the
+            // transport falls back to PHP's default_socket_timeout
+            // (commonly 60s), and this mailer is invoked *synchronously*
+            // from inside request-critical flows (admin login, etc. --
+            // see app/Http/Traits/Notify.php) because no queue worker is
+            // running, so ->queue() behaves like ->send(). Port 2465 (set
+            // in docker-entrypoint.sh) already routes around Railway's
+            // block on 465/587, but a short timeout is kept as a
+            // defense-in-depth: if the mail host is ever unreachable for
+            // any other reason, the request fails fast instead of
+            // stalling long enough for the browser to give up.
+            'timeout' => (int) env('MAIL_TIMEOUT', 8),
             'auth_mode' => null,
         ],
 
