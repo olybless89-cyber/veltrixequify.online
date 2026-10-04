@@ -108,6 +108,18 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 
 # Fix uploads directory
 mkdir -p /var/www/html/assets/uploads
+
+# If a persistent volume is mounted here and this is its first boot, it
+# starts empty and shadows the baked-in seed images entirely. Populate it
+# once from the pristine backup taken at build time (see Dockerfile) --
+# on every later boot the volume already has content (seed images plus
+# anything uploaded via the admin panel since), so this is skipped and
+# nothing already there is touched.
+if [ -z "$(ls -A /var/www/html/assets/uploads 2>/dev/null)" ] && [ -d /var/www/html/assets/uploads-seed ]; then
+    echo "Uploads directory is empty -- seeding it from the baked-in defaults..."
+    cp -r /var/www/html/assets/uploads-seed/. /var/www/html/assets/uploads/
+fi
+
 chown -R www-data:www-data /var/www/html/assets/uploads 2>/dev/null || true
 chmod -R 775 /var/www/html/assets/uploads 2>/dev/null || true
 

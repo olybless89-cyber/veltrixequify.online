@@ -45,6 +45,14 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Copy application source code
 COPY . /var/www/html
 
+# Keep a pristine backup of the baked-in uploads (seed images that ship
+# with the app) at a separate path, outside where a Railway volume gets
+# mounted at runtime. A volume mounted at assets/uploads starts empty and
+# would otherwise shadow these files entirely -- docker-entrypoint.sh uses
+# this backup to seed the volume on its first boot, and leaves it alone
+# on every boot after that so admin-uploaded images are never touched.
+RUN cp -r /var/www/html/assets/uploads /var/www/html/assets/uploads-seed
+
 # Make entrypoint script executable
 RUN chmod +x /var/www/html/docker-entrypoint.sh
 
