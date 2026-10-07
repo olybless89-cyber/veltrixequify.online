@@ -57,7 +57,16 @@ function getFile($image, $clean = '')
     // asset() so the generated URL is unaffected.
     $path = $image && substr($image, 0, 1) !== '/' ? base_path($image) : $image;
 
-    return $path && file_exists($path) && is_file($path) ? asset($image) . $clean : asset(config('location.default'));
+    if (!($path && file_exists($path) && is_file($path))) {
+        return asset(config('location.default'));
+    }
+    // Cache-bust with the file's modification time: images are served with a
+    // 30-day cache header, so a replaced image (same filename) would otherwise
+    // keep showing the old copy in visitors' browsers.
+    if ($clean === '') {
+        $clean = '?v=' . @filemtime($path);
+    }
+    return asset($image) . $clean;
 }
 
 function removeFile($path)
