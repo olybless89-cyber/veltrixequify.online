@@ -1,0 +1,6 @@
+# Upload images that the repo should OVERWRITE on the persistent volume at
+# every boot (when the volume copy differs). One path per line, relative to
+# assets/uploads/. Use for images you replace via git, not via the admin panel.
+content/63ac0ff74380e1672220663.png
+content/6ac1f1d2bbb7e1791095250.jpg
+content/thumb_6ac1f1d2bbb7e1791095250.jpg

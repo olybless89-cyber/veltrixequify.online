@@ -126,6 +126,18 @@ if [ -d "$SEED" ]; then
     done
 fi
 
+# Force-sync: images listed in docker/uploads-force-sync.txt are replaced
+# via git, so the baked-in copy must win over the volume copy when they differ.
+FORCE_LIST=/var/www/html/docker/uploads-force-sync.txt
+if [ -d "$SEED" ] && [ -f "$FORCE_LIST" ]; then
+    grep -v '^[[:space:]]*#' "$FORCE_LIST" | sed '/^[[:space:]]*$/d' | while IFS= read -r f; do
+        if [ -f "$SEED/$f" ] && ! cmp -s "$SEED/$f" "$DEST/$f"; then
+            mkdir -p "$(dirname "$DEST/$f")"
+            cp "$SEED/$f" "$DEST/$f" && echo "  force-synced upload: $f"
+        fi
+    done
+fi
+
 chown -R www-data:www-data /var/www/html/assets/uploads 2>/dev/null || true
 chmod -R 775 /var/www/html/assets/uploads 2>/dev/null || true
 
