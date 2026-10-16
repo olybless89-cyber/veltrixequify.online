@@ -77,3 +77,4 @@ RUN if [ ! -d vendor ]; then \
 EXPOSE 80 8080 3000
 
 ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
+EXPOSE 8080
