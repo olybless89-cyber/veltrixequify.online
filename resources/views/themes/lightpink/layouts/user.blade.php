@@ -178,5 +178,6 @@
         root.style.setProperty('--primary', '{{config('basic.base_color')??'#ff007a'}}');
     </script>
 
+@include('partials.smartsupp')
 </body>
 </html>

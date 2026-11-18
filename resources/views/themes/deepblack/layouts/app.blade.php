@@ -281,6 +281,7 @@
 {{-- -- Matrix AI Chatbot Widget -- --}}
 @include('partials.chatbot')
 
+@include('partials.smartsupp')
 </body>
 
 </html>

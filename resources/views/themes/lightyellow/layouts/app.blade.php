@@ -169,5 +169,6 @@
             root.style.setProperty('--secondary', '{{config('basic.secondary_color')??'#f6761a'}}');
             root.style.setProperty('--dark_moderate_blue', '{{config('basic.heading_color')??'#5b53a2'}}');
         </script>
-    </body>
+    @include('partials.smartsupp')
+</body>
 </html>
