@@ -40,9 +40,15 @@
                             <div id="google_translate_element"></div>
                             <h1>@lang(@$hero['description']->title) @lang(@$hero['description']->sub_title)</h1>
                             <p>@lang(@$hero['description']->short_description)</p>
-                            <a class="btn-custom mt-4" href="{{@$hero->templateMedia()->button_link}}" target="_blank">
-                                @lang(@$hero['description']->button_name)
-                            </a>
+                            @guest
+                                <a class="btn-custom mt-4" href="{{ route('register') }}">
+                                    @lang('Register')
+                                </a>
+                            @else
+                                <a class="btn-custom mt-4" href="{{ route('user.home') }}">
+                                    @lang('Dashboard')
+                                </a>
+                            @endguest
                         </div>
                     </div>
                     <div class="col-lg-6 d-none d-lg-block">
