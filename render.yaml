@@ -40,7 +40,7 @@ services:
       - key: APP_KEY
         sync: false
       - key: APP_URL
-        value: https://veltrixequify.onrender.com
+        value: https://veltrixequify-2ug4.onrender.com
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
@@ -66,6 +66,6 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: ADMIN_RESET_PASSWORD
-        value: "true"
+        value: "false"
       - key: SMARTSUPP_KEY
         value: 3a2561a89a73408e7c5cac17b6101f4436aeb30a
