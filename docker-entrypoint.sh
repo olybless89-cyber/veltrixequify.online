@@ -146,10 +146,10 @@ if [ ! -e /var/www/html/public/assets ]; then
     ln -sf /var/www/html/assets /var/www/html/public/assets
 fi
 
-# 9. Wait for database to be ready (max 60s)
+# 9. Wait for database to be ready (max ~4 min; a fresh DB on Render can be slow to start)
 echo "Waiting for database connection..."
 DB_READY=0
-for i in $(seq 1 30); do
+for i in $(seq 1 120); do
     # Fallback check
     if php -r "
         try {
@@ -160,7 +160,7 @@ for i in $(seq 1 30); do
         DB_READY=1
         break
     fi
-    echo "  DB not ready yet (attempt $i/30)... retrying in 2s"
+    echo "  DB not ready yet (attempt $i/120)... retrying in 2s"
     sleep 2
 done
 

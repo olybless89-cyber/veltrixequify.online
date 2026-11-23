@@ -1,0 +1,71 @@
+# Render Blueprint for Veltrix Equify
+# - veltrix-mysql: private MariaDB (MySQL-compatible) service with a persistent disk
+# - veltrixequify: the Laravel app (Dockerfile), auto-deploys on push to master
+services:
+  - type: pserv
+    name: veltrix-mysql
+    runtime: image
+    image:
+      url: docker.io/library/mariadb:11.4
+    plan: starter
+    region: oregon
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 1
+    envVars:
+      - key: MARIADB_DATABASE
+        value: veltrix
+      - key: MARIADB_USER
+        value: veltrix
+      - key: MARIADB_PASSWORD
+        generateValue: true
+      - key: MARIADB_ROOT_PASSWORD
+        generateValue: true
+
+  - type: web
+    name: veltrixequify
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    branch: master
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        value: https://veltrixequify.onrender.com
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: veltrix-mysql
+          property: host
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        value: veltrix
+      - key: DB_USERNAME
+        value: veltrix
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: veltrix-mysql
+          envVarKey: MARIADB_PASSWORD
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_EMAIL
+        value: admin@veltrixequify.online
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_RESET_PASSWORD
+        value: "true"
+      - key: SMARTSUPP_KEY
+        value: 3a2561a89a73408e7c5cac17b6101f4436aeb30a
