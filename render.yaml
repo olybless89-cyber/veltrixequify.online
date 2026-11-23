@@ -3,7 +3,7 @@
 # - veltrixequify: the Laravel app (Dockerfile), auto-deploys on push to master
 services:
   - type: pserv
-    name: veltrix-mysql
+    name: veltrix-mysql-2ug4
     runtime: image
     image:
       url: docker.io/library/mariadb:11.4
@@ -24,7 +24,7 @@ services:
         generateValue: true
 
   - type: web
-    name: veltrixequify
+    name: veltrixequify-online
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
@@ -40,13 +40,13 @@ services:
       - key: APP_KEY
         sync: false
       - key: APP_URL
-        value: https://veltrixequify-2ug4.onrender.com
+        value: https://veltrixequify-online.onrender.com
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
         fromService:
           type: pserv
-          name: veltrix-mysql
+          name: veltrix-mysql-2ug4
           property: host
       - key: DB_PORT
         value: "3306"
@@ -57,7 +57,7 @@ services:
       - key: DB_PASSWORD
         fromService:
           type: pserv
-          name: veltrix-mysql
+          name: veltrix-mysql-2ug4
           envVarKey: MARIADB_PASSWORD
       - key: ADMIN_USERNAME
         value: admin
