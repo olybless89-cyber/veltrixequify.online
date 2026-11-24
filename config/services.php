@@ -34,4 +34,10 @@ return [
         'key' => env('SMARTSUPP_KEY'),
     ],
 
+    // tawk.to live chat. TAWK_ID = "propertyId/widgetId". When set, the chat
+    // shows on every page regardless of the admin Tawk switch.
+    'tawk' => [
+        'id' => env('TAWK_ID', '6b059b84d7572d3d0fdde834/1k86uevh3'),
+    ],
+
 ];

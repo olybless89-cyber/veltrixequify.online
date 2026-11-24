@@ -20,23 +20,24 @@
 @endif
 
 
-@if(basicControl()->tawk_status)
-
+@php
+    $tawkId = trim((string) config('services.tawk.id'));
+    if ($tawkId === '' && basicControl()->tawk_status) {
+        $tawkId = trim((string) basicControl()->tawk_id);
+    }
+@endphp
+@if($tawkId !== '')
     <!--Start of Tawk.to Script-->
     <script type="text/javascript">
-        $(document).ready(function () {
-            {{--var Tawk_SRC = 'https://embed.tawk.to/' + "{{ trim(basicControl()->tawk_id) }}" + '/1g8dl1qqo';--}}
-             var Tawk_SRC = 'https://embed.tawk.to/' + "{{ trim(basicControl()->tawk_id)}}";
-            var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-            (function () {
-                var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-                s1.async = true;
-                s1.src = Tawk_SRC;
-                s1.charset = 'UTF-8';
-                s1.setAttribute('crossorigin', '*');
-                s0.parentNode.insertBefore(s1, s0);
-            })();
-        });
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/' + @json($tawkId);
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
     </script>
     <!--End of Tawk.to Script-->
 @endif

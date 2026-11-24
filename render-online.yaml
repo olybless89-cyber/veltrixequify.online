@@ -67,5 +67,5 @@ services:
         sync: false
       - key: ADMIN_RESET_PASSWORD
         value: "false"
-      - key: SMARTSUPP_KEY
-        value: 3a2561a89a73408e7c5cac17b6101f4436aeb30a
+      - key: TAWK_ID
+        value: 6b059b84d7572d3d0fdde834/1k86uevh3
